@@ -30,7 +30,32 @@ const quotes=[['It always seems impossible until it’s done.','— Nelson Mande
 function randomQuote(){let i=Math.floor(Math.random()*quotes.length);$('#quoteText').textContent='“'+quotes[i][0]+'”';$('#quoteAuthor').textContent=quotes[i][1]}
 $('#newQuote').addEventListener('click',randomQuote);
 const now=new Date();const localISO=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;const dateFrom=s=>{let [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
-function updateDate(){const d=new Date();$('#dayName').textContent=d.toLocaleDateString(undefined,{weekday:'long'});$('#dateLine').textContent=d.toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});$('#yearLine').textContent='A new day, a fresh start.'}updateDate();
+function updateDate() {
+  const qatarTime = new Date(
+    new Date().toLocaleString('en-US', {
+      timeZone: 'Asia/Qatar'
+    })
+  );
+
+  $('#dayName').textContent = qatarTime.toLocaleDateString(
+    'en-GB',
+    { weekday: 'long', timeZone: 'UTC' }
+  );
+
+  $('#dateLine').textContent = qatarTime.toLocaleDateString(
+    'en-GB',
+    {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC'
+    }
+  );
+
+  $('#yearLine').textContent = 'A new day, a fresh start.';
+}
+
+updateDate();
 const STORAGE='roseHourV1';let saved={};try{saved=JSON.parse(localStorage.getItem(STORAGE)||'{}')}catch(e){};let tasks=Array.isArray(saved.tasks)?saved.tasks:[];let focusByDay=saved.focusByDay||{};let totalFocus=saved.totalFocus||0;let completedSessions=saved.completedSessions||0;
 function persist(){try{localStorage.setItem(STORAGE,JSON.stringify({tasks,focusByDay,totalFocus,completedSessions}))}catch(e){};updateHomeStats()}
 function updateHomeStats(){let today=localISO(new Date()),mins=focusByDay[today]||0;$('#taskSummary').textContent=`${tasks.length} task${tasks.length===1?'':'s'}`;$('#calendarSummary').textContent=`${tasks.filter(t=>t.date===today).length} planned today`;$('#homeMinutes').textContent=`${mins} min focused`;$('#homeDone').textContent=tasks.filter(t=>t.status==='done').length;$('#homeFocus').textContent=`${mins} min`;$('#focusMinutes').textContent=mins;$('#sessionCount').textContent=completedSessions;$('#allTimeMinutes').textContent=`${totalFocus} min`;$('#sessionsLeft').textContent=`${sessionsUntilLong} session${sessionsUntilLong===1?'':'s'}`}
