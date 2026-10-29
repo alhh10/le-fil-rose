@@ -1956,58 +1956,50 @@
       }
 
       interval = setInterval(() => {
-        remaining--;
+        remaining = Math.max(0, remaining - 1);
+
+      if (mode === 'work') {
+        const today = localISO(new Date());
+        focusByDay[today] = (focusByDay[today] || 0) + 1;
+        totalFocus++;
+      }
+
+      if (remaining <= 0) {
+        clearInterval(interval);
+        interval = null;
 
         if (mode === 'work') {
-          const today = qatarISO();
-          focusByDay[today] = (focusByDay[today] || 0) + 1;
-          totalFocus++;
-        }
+          completedSessions++;
+          sessionsUntilLong--;
 
-        if (remaining <= 0) {
-          clearInterval(interval);
-          interval = null;
-
-          const finishedMode = mode;
-
-          if (finishedMode === 'work') {
-            completedSessions++;
-            sessionsUntilLong--;
-
-            if (sessionsUntilLong <= 0) {
-              sessionsUntilLong = settings.sessions;
-              setMode('long');
-            } else {
-              setMode('short');
-            }
+          if (sessionsUntilLong <= 0) {
+            sessionsUntilLong = settings.sessions;
+            setMode('long');
           } else {
-            setMode('work');
-          }
-
-          persist();
-
-          try {
-            if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('Le Fil Rose', {
-                body: finishedMode === 'work'
-                  ? 'Focus session complete. Take a little break.'
-                  : 'Break is over. Ready when you are?'
-              });
-            }
-          } catch (error) {
-            // Notifications may be unavailable in some browsers.
+            setMode('short');
           }
         } else {
-          if (remaining % 60 === 59) {
-            persist();
-          }
-
-          updateTimerUI();
+          setMode('work');
         }
-      }, 1000);
 
-      updateTimerUI();
-    }
+        persist();
+
+        try {
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Le Fil Rose', {
+              body: 'Your session is complete. Take a little breath.'
+            });
+          }
+        } catch (e) {}
+
+      } else {
+        persist();
+        updateTimerUI();
+      }
+    }, 1000);
+
+    updateTimerUI();
+  }
 
     $('#startPause').onclick = startTimer;
     $('#resetTimer').onclick = resetTimer;
