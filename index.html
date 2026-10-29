@@ -1871,12 +1871,13 @@
       short: 5,
       sessions: 4,
       long: 15
-    };
+    }; 
 
     let mode = 'work';
-    let remaining = settings.work * 60;
+    let remaining = 1500;
     let interval = null;
-    let sessionsUntilLong = settings.sessions;
+    let sessionsUntilLong = 4;
+    let lastTick = null;
 
     const ringCircumference = 2 * Math.PI * 45;
     $('#ringProgress').style.strokeDasharray = ringCircumference;
