@@ -1961,8 +1961,22 @@
 
       if (mode === 'work') {
         const today = localISO(new Date());
-        focusByDay[today] = (focusByDay[today] || 0) + 1;
-        totalFocus++;
+
+        if (!window.focusSeconds) {
+          window.focusSeconds = 0;
+        }
+
+        window.focusSeconds++;
+
+        if (window.focusSeconds >= 60) {
+          const minutesToAdd = Math.floor(window.focusSeconds / 60);
+          window.focusSeconds %= 60;
+
+          focusByDay[today] = (focusByDay[today] || 0) + minutesToAdd;
+          totalFocus += minutesToAdd;
+
+          persist();
+        }
       }
 
       if (remaining <= 0) {
